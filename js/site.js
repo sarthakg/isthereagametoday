@@ -9,79 +9,65 @@ function ISODateString(d){
 }  
 
 $(document).ready(function(){
-    var url = 'data/giants2014schedule.json';
+    var url = 'data/levis2015schedule.json';
 
     var today = new Date();
-    var nextGame = null;
-    var todaysGame = null;
+    var nextEvent = null;
+    var todaysEvent = null;
     
     // Format date as MM/DD/YY
     var curr_date = today.getDate();
     var curr_month = today.getMonth() + 1;
     var curr_year = today.getFullYear();
-    // var dateString = curr_month + "/" + curr_date + "/" + curr_year;
-    
-    // Create datepicker
-    // $("#datecheck").html('Checking <input id="datepicker" type="text">');
-    // $("#datepicker").datepicker();
 
-    // $(".datepicker").datepicker.("setDate", dateString);
-
-    // Check for game today               
+    // Check for events today
     $.getJSON(url, function(json){
-        var nextGameDate;
+        var nextEventDate;
         
-        $.each(json.games,function(i,game){
-            nextGameDate = new Date(game.date);
+        $.each(json.events,function(i,event){
+            nextEventDate = new Date(event.date);
                
             // Uncomment for debugging 
-            console.log("Today: " + today + " - Looking at game: " + nextGameDate);
+            console.log("Today: " + today + " - Looking at event: " + nextEventDate);
 
-          if (!nextGame && isDateLaterThan(nextGameDate, today)){
-            nextGame = game;
+          if (!nextEvent && isDateLaterThan(nextEventDate, today)){
+            nextEvent = event;
             return false; // break the loop
           }
           
-            if(today.getYear() == nextGameDate.getYear() && today.getMonth() == nextGameDate.getMonth() && today.getDate() == nextGameDate.getDate()) {
-              todaysGame = game;
+            if(today.getYear() == nextEventDate.getYear() && today.getMonth() == nextEventDate.getMonth() && today.getDate() == nextEventDate.getDate()) {
+              todaysEvent = event;
               return false; // break the loop
             }            
         });
         
-        if (todaysGame) {
-            $(".fill-in").text("YES");
-            $("#game .summary").text("Giants play the " + todaysGame.opponent);
-            $("#game .location").text(todaysGame.location);
-            $("#game .tstart").text(todaysGame.time);
+        if (todaysEvent) {
+            $(".fill-in").text("NO");
+            $("#event .summary").text("Event at Levi's today: " + todaysEvent.name);
+            $("#event .location").text(todaysEvent.location);
+            $("#event .tstart").text(todaysEvent.time);
             
-            $("#game abbr").attr('title', ISODateString(nextGameDate));
-            if (todaysGame.location == "AT&T Park") {
-                $("body").addClass("home");
-                $("#yesno .homeaway").text("At home");
-             }
-             else {
-                $("body").addClass("away");
-                $("#yesno .homeaway").text("Away");
-                $("#yesno").css("border-color", "#000");
-             }
-            $("#game").show();
+            $("#event abbr").attr('title', ISODateString(nextEventDate));
+            $("body").addClass("home");
+         //   $("#yesno .homeaway").text(todaysEvent.name + " @ Levi's");
+
+            $("#event").show();
         }
         else {
-          $(".fill-in").text("NO");
-          $("#game .date").text(nextGame.date);
-          $("#game .summary").text("Giants will play the " + nextGame.opponent);
-          $("#game .location").text(nextGame.location);
-          
-          // Format next game date as day of the week
-          var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-          var nextGameDay = weekday[nextGameDate.getDay()];
-          $("#game .day").text("on " + nextGameDay);
-          $("#game .tstart").text(nextGame.time);
-          // if (nextGame.location == "AT&T Park") {
-          //  $("#nextgame .location").addClass("homegame");
-          //   $("body").addClass("homegame-bg");
-          // }
-          $("#game").show();
+             $(".fill-in").text("YES");
+
+            // Format next game date as day of the week
+              var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+              var nextEventDay = weekday[nextEventDate.getDay()];
+              $("#event .tstart").text(nextEvent.time);
+              $("body").addClass("away");
+         //     $("#yesno .homeaway").text("Next event at Levi's: " + nextEvent.name + " on " + nextEvent.date + " (" + nextEventDay + ")");
+              $("#event .summary").text("Next event at Levi's Stadium: " + nextEvent.name + " on " + nextEvent.date + " (" + nextEventDay + ")");
+              $("#event .date").text(nextEvent.date);
+              $("#event .location").text(nextEvent.location);
+
+
+          $("#event").show();
         }
     });                
 });    
